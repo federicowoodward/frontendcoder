@@ -1,49 +1,45 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios"
-// import userEvent from "@testing-library/user-event";
+import Loader from "./loader.js";
 
 export default function Register() {
     const [registerStatus, setRegisterStatus] = useState(false);
     const [user, setUser] = useState([]);
+    const [error, setError] = useState({});
+    const [loader, setLoader] = useState(false)
 
     const newUser = (e) => {
         e.preventDefault()
+        
+        setErrorFunction({"status": "good"})
         if (user.password2 === undefined) {
-            alert("Ingrese dato")
+            setErrorFunction({"status": "error", "error": "faltan datos"})
         } else {
             if (user.password2 === user.password) {
+                setLoader(true)
+                setTimeout(() => {
+                    setLoader(false)
+                }, 2000);
                 axios.post("http://localhost:8080/users/register", {
                     name: user.name,
                     password: user.password
                 })
-                    .then(function (response) {
-                        if (response.data.status === "created"){
-                            setRegisterStatus(true)
-                        }
-                    })
-
+                .then(function (response) {
+                    if (response.data.status === "created"){
+                        setRegisterStatus(true)
+                    } 
+                })
             } else {
-                alert("las contraseñas no coinciden")
+                setErrorFunction({"status": "error", "error": "las contraseñas no coinciden"})
                 return;
             }
 
         }
     }
 
-    const cookies = (e) => {
-        e.preventDefault()
-
-        fetch("http://localhost:8080/cookies")
-            .then(function (response) {
-                console.log(response)
-            })
-    }
-
-    const unlogin = (e) => {
-        e.preventDefault()
-        setUser([])
-        setRegisterStatus(false)
+    const setErrorFunction = (error) => {
+        setError(error)
     }
 
     const defineUser = (e) => {
@@ -53,7 +49,11 @@ export default function Register() {
             [e.target.name]: e.target.value
         })
     }
-
+    if(loader) {
+        return (
+            <Loader />
+        );
+    }
     if (!registerStatus) {
         return (
             <div>
@@ -78,9 +78,13 @@ export default function Register() {
                     />
                     <button
                         onClick={(e) => newUser(e)}>Entrar</button>
-                    <button
-                        onClick={(e) => cookies(e)}></button>
                 </form>
+                {
+                    error.status === "error" &&
+                    <div>
+                        <p>{error.error}</p>
+                    </div>
+                }
                 <Link to="/home" >
                     <button>Volver</button>
                 </Link>
@@ -89,8 +93,10 @@ export default function Register() {
     } else if (registerStatus) {
         return (
             <div>
-                <h2>Bienvenido {user.name}</h2>
-                <button onClick={(e) => unlogin(e)}>Desloguearse</button>
+                <h2>Cuenta creada {user.name}! Loegate aqui abajo</h2>
+                <Link to="/login" >
+                    <button>Login</button>
+                </Link>
             </div>
         );
     }

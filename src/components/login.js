@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios"
-
+import Loader from "./loader.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
@@ -9,6 +9,7 @@ export default function Login() {
     const [userLogueado, setUserLogueado] = useState("")
     const [despedida, setDespedida] = useState(false);
     const [error, setError] = useState({});
+    const [loader, setLoader] = useState(false)
 
     useEffect(() => {
         searchStatus()
@@ -25,15 +26,21 @@ export default function Login() {
     }
     const loginUser = async (e) => {
         e.preventDefault()
+        setErrorFunction({"status": "good"})
         if (user.password === undefined || user.name === undefined) {
-            alert("Ingrese dato")
+            setErrorFunction({ "status": "error", "error": "faltan datos"})
         } else {
+            setLoader(true)
+            setTimeout(() => {
+                setLoader(false)
+            }, 2000);
             axios.post("http://localhost:8080/users/login", {
                 name: user.name,
                 password: user.password
             })
             .then(async function  (response) {
                 if (response.data.status === "correct") {
+                    setErrorFunction("")
                     const data = await cookies()
                     if (data.message === "saves") {
                     } else {
@@ -46,6 +53,7 @@ export default function Login() {
             })
         }
     }
+
 
     const setErrorFunction = (error) => {
         setError(error)
@@ -99,10 +107,15 @@ export default function Login() {
             [e.target.name]: e.target.value
         })
     }
+    if(loader) {
+        return (
+            <Loader />
+        );
+    }
     if (despedida) {
         return (
             <div>
-                <h2>Hasta luego {userLogueado}</h2>
+                <h2 style={{"color" : "black"}}>Hasta luego {userLogueado}, vuelve pronto!</h2>
             </div>
         );
     }
