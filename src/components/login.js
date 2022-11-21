@@ -10,6 +10,7 @@ export default function Login() {
     const [despedida, setDespedida] = useState(false);
     const [error, setError] = useState({});
     const [loader, setLoader] = useState(false)
+    const [userRecuperado, setRecuperado] = useState()
 
     useEffect(() => {
         searchStatus()
@@ -22,6 +23,19 @@ export default function Login() {
             setLoginStatus(true)
         } else {
             setLoginStatus(false)
+            recuperarIntento() 
+        }
+    }
+
+    const recuperarIntento = () => {
+        let name = localStorage.getItem(`name`)
+        let password = localStorage.getItem(`password`)
+        if (name === null) {
+            return
+        } else {
+            setRecuperado({name: name, password: password})
+            localStorage.removeItem('name');
+            localStorage.removeItem('password')
         }
     }
     const loginUser = async (e) => {
@@ -48,12 +62,13 @@ export default function Login() {
                     }
                     setLoginStatus(true)
                 } else if (response.data.status === "error") {
+                    localStorage.setItem("name", user.name)
+                    localStorage.setItem("password", user.password)
                     setErrorFunction(response.data)
                 }
             })
         }
     }
-
 
     const setErrorFunction = (error) => {
         setError(error)
@@ -125,9 +140,10 @@ export default function Login() {
                 <form >
                     <input
                         onChange={(e) => { defineUser(e) }}
+                        id= "name"
                         type="text"
                         name="name"
-                        placeholder="nombre"
+                        placeholder={ userRecuperado === undefined ? "nombre" : userRecuperado.name}
                     />
                     <input
                         onChange={(e) => { defineUser(e) }}
