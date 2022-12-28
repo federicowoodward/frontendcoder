@@ -10,7 +10,6 @@ export default function Login() {
     const [despedida, setDespedida] = useState(false);
     const [error, setError] = useState({});
     const [loader, setLoader] = useState(false)
-    const [userRecuperado, setRecuperado] = useState()
 
     useEffect(() => {
         searchStatus()
@@ -23,21 +22,9 @@ export default function Login() {
             setLoginStatus(true)
         } else {
             setLoginStatus(false)
-            recuperarIntento() 
         }
     }
 
-    const recuperarIntento = () => {
-        let name = localStorage.getItem(`name`)
-        let password = localStorage.getItem(`password`)
-        if (name === null) {
-            return
-        } else {
-            setRecuperado({name: name, password: password})
-            localStorage.removeItem('name');
-            localStorage.removeItem('password')
-        }
-    }
     const loginUser = async (e) => {
         e.preventDefault()
         setErrorFunction({"status": "good"})
@@ -56,14 +43,13 @@ export default function Login() {
                 if (response.data.status === "correct") {
                     setErrorFunction("")
                     const data = await cookies()
+                    console.log(data)
                     if (data.message === "saves") {
                     } else {
                         alert("no hemos podido recordarte, tendras que reloguearte")
                     }
                     setLoginStatus(true)
                 } else if (response.data.status === "error") {
-                    localStorage.setItem("name", user.name)
-                    localStorage.setItem("password", user.password)
                     setErrorFunction(response.data)
                 }
             })
@@ -77,11 +63,13 @@ export default function Login() {
     const cookies = async () => {
         try {
             const { data } = await axios.post(
-                "/cookies",
+                "http://localhost:8080/users/cookies",
                 {
                     name: user.name,
                 },
-                { withCredentials: true }
+                { 
+                    withCredentials: true 
+                }
             )
             return data
         } catch (err) {
@@ -91,10 +79,10 @@ export default function Login() {
 
     const getcookies = async () => {
         try {
-            const { data } = await axios.get("/getcookies");
+            const { data } = await axios.get("http://localhost:8080/users/getcookies");
             return data
         } catch (err) {
-            console.log("a" + err)
+            console.log(+ err)
         }
 
     }
@@ -102,7 +90,7 @@ export default function Login() {
     const unlogin = async (e) => {
         e.preventDefault()
         try {
-            axios.delete("/deletecookies")
+            axios.delete("http://localhost:8080/users/deletecookies")
                 setLoginStatus(false)
                 setDespedida(true)
         } catch (err) {
@@ -143,7 +131,7 @@ export default function Login() {
                         id= "name"
                         type="text"
                         name="name"
-                        placeholder={ userRecuperado === undefined ? "nombre" : userRecuperado.name}
+                        placeholder="nombre"
                     />
                     <input
                         onChange={(e) => { defineUser(e) }}
