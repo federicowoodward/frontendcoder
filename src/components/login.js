@@ -2,29 +2,82 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios"
 import Loader from "./loader.js";
+import Menu from "./menu.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
     const [user, setUser] = useState([]);
-    const [userLogueado, setUserLogueado] = useState("")
     const [despedida, setDespedida] = useState(false);
     const [error, setError] = useState({});
     const [loader, setLoader] = useState(false)
-
+    
     useEffect(() => {
         searchStatus()
     })
 
     const searchStatus = async () => {
-        const data = await getcookies()
+        const data = await cookiesManager("check")
+        console.log(data)
         if (data.data.user !== undefined) {
-            setUserLogueado(data.data.user)
+            setUser(data.data.user)
             setLoginStatus(true)
         } else {
             setLoginStatus(false)
         }
     }
 
+
+    async function cookiesManager (identifier) {
+        switch (identifier) {
+
+            case "create": 
+                try {
+                    const { data } = await axios.post(
+                        "http://localhost:8080/users/cookies",
+                        {
+                            name: user.name,
+                        },
+                        { 
+                            withCredentials: true 
+                        }
+                    )
+                    return data
+                } catch (err) {
+                    console.log(err)
+                }
+            break;
+
+            case "update": 
+
+            break;
+
+            case "check": 
+                try {
+                    const { data } = await axios.get("http://localhost:8080/users/getcookies");
+                    return data
+                } catch (err) {
+                    console.log(+ err)
+                }
+            break;
+
+            case "delete": 
+                axios.delete("http://localhost:8080/users/deletecookies")
+            break;
+            
+            default:   
+                console.log("falta identificador")
+                return;
+        }
+    }
+
+    const defineUser = (e) => {
+        e.preventDefault()
+        setUser({
+            ...user,
+            [e.target.name]: e.target.value
+        })
+    }
+    
     const loginUser = async (e) => {
         e.preventDefault()
         setErrorFunction({"status": "good"})
@@ -34,16 +87,14 @@ export default function Login() {
             setLoader(true)
             setTimeout(() => {
                 setLoader(false)
-            }, 2000);
+            }, 1000);
             axios.post("http://localhost:8080/users/login", {
                 name: user.name,
                 password: user.password
             })
             .then(async function  (response) {
                 if (response.data.status === "correct") {
-                    setErrorFunction("")
-                    const data = await cookies()
-                    console.log(data)
+                    const data = await cookiesManager("create")
                     if (data.message === "saves") {
                     } else {
                         alert("no hemos podido recordarte, tendras que reloguearte")
@@ -60,39 +111,12 @@ export default function Login() {
         setError(error)
     }
 
-    const cookies = async () => {
-        try {
-            const { data } = await axios.post(
-                "http://localhost:8080/users/cookies",
-                {
-                    name: user.name,
-                },
-                { 
-                    withCredentials: true 
-                }
-            )
-            return data
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    const getcookies = async () => {
-        try {
-            const { data } = await axios.get("http://localhost:8080/users/getcookies");
-            return data
-        } catch (err) {
-            console.log(+ err)
-        }
-
-    }
-
     const unlogin = async (e) => {
         e.preventDefault()
         try {
-            axios.delete("http://localhost:8080/users/deletecookies")
-                setLoginStatus(false)
-                setDespedida(true)
+            cookiesManager("delete")
+            setLoginStatus(false)
+            setDespedida(true)
         } catch (err) {
             console.log(err)
         }
@@ -103,26 +127,19 @@ export default function Login() {
         }, 2000)
     }
 
-    const defineUser = (e) => {
-        e.preventDefault()
-        setUser({
-            ...user,
-            [e.target.name]: e.target.value
-        })
-    }
     if(loader) {
         return (
             <Loader />
         );
     }
-    if (despedida) {
+    else if (despedida) {
         return (
             <div>
-                <h2 style={{"color" : "black"}}>Hasta luego {userLogueado}, vuelve pronto!</h2>
+                <h2 style={{"color" : "black"}}>Hasta luego {user.name}, vuelve pronto!</h2>
             </div>
         );
     }
-    if (!loginStatus) {
+    else if (!loginStatus) {
         return (
             <div>
                 <form >
@@ -155,10 +172,13 @@ export default function Login() {
         );
     } else if (loginStatus) {
         return (
+            <>
             <div>
-                <h2>Bienvenido {userLogueado}</h2>
+                <h2>Bienvenido {user.name}</h2>
                 <button onClick={(e) => unlogin(e)}>Desloguearse</button>
             </div>
+                <Menu />
+            </>
         );
     }
 }
