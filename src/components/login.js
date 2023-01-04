@@ -1,29 +1,27 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios"
-import Loader from "./loader.js";
-import Menu from "./menu.js";
+import Loader from "./loaders/loader.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
     const [user, setUser] = useState([]);
-    const [despedida, setDespedida] = useState(false);
     const [error, setError] = useState({});
     const [loader, setLoader] = useState(false)
     
     useEffect(() => {
-        searchStatus()
+        checkCookies()
     })
 
-    const searchStatus = async () => {
+    const checkCookies = async () => {
         const data = await cookiesManager("check")
         console.log(data)
-        if (data.data.user !== undefined) {
-            setUser(data.data.user)
-            setLoginStatus(true)
-        } else {
-            setLoginStatus(false)
-        }
+        // if (data.data.user !== undefined) {
+        //     setUser(data.data.user)
+        //     setLoginStatus(true)
+        // } else {
+        //     setLoginStatus(false)
+        // }
     }
 
 
@@ -111,34 +109,12 @@ export default function Login() {
         setError(error)
     }
 
-    const unlogin = async (e) => {
-        e.preventDefault()
-        try {
-            cookiesManager("delete")
-            setLoginStatus(false)
-            setDespedida(true)
-        } catch (err) {
-            console.log(err)
-        }
-
-        setTimeout(() => {
-            setDespedida(false)
-            setUser([])
-        }, 2000)
-    }
-
     if(loader) {
         return (
             <Loader />
         );
     }
-    else if (despedida) {
-        return (
-            <div>
-                <h2 style={{"color" : "black"}}>Hasta luego {user.name}, vuelve pronto!</h2>
-            </div>
-        );
-    }
+ 
     else if (!loginStatus) {
         return (
             <div>
@@ -170,15 +146,12 @@ export default function Login() {
                 </Link>
             </div>
         );
-    } else if (loginStatus) {
+    }
+    if (loginStatus) {
         return (
-            <>
-            <div>
-                <h2>Bienvenido {user.name}</h2>
-                <button onClick={(e) => unlogin(e)}>Desloguearse</button>
-            </div>
-                <Menu />
-            </>
+            <Link to={`/menu/?user=${user.name}`}>
+                <button>Menu</button>
+            </Link>
         );
     }
 }
