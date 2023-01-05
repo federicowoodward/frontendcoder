@@ -5,21 +5,26 @@ import Register from "./components/register";
 import Menu from "./components/menu";
 import NavBar from "./components/navBar.js";
 import ItemListContainer from "./components/products/itemListContainer.js";
+import ItemDetail from "./components/products/itemDetail.js";
+import CartContextProvider from "./context/productsContext.js";
 
 function App() {
     return (
         <BrowserRouter>
-            <div className="app">
-                    <NavBar />
-                    <ItemListContainer />
-                <Routes>
-                    <Route path="/" element={<LoginIndex />}/>
-                    <Route path="/home" element={<LoginIndex />}/>
-                    <Route path="/login" element={<Login />}/>
-                    <Route path="/register" element={<Register />}/>
-                    <Route path="/menu/:user" element={< Menu />}/>
-                </Routes>
-            </div>
+            <CartContextProvider value={{}}>
+                <div className="app">
+                        <NavBar />
+                        <ItemListContainer />
+                    <Routes>
+                        <Route path="/" element={<LoginIndex />}/>
+                        <Route path="/home" element={<LoginIndex />}/>
+                        <Route path="/login" element={<Login />}/>
+                        <Route path="/register" element={<Register />}/>
+                        <Route path="/menu/:user" element={< Menu />}/>
+                        <Route path="/detail/:id" element={< ItemDetail />}/>
+                    </Routes>
+                </div>
+            </CartContextProvider>
         </BrowserRouter>
     );
 }
