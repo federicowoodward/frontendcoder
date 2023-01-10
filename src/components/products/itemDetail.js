@@ -1,6 +1,7 @@
 import {  useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UseCartContext } from "../../context/productsContext.js";
+import axios from "axios";
 
 export default function Detail() {
     const [product, setProduct] = useState([])
@@ -8,14 +9,10 @@ export default function Detail() {
     const {id} = useParams()
     
     useEffect(() => {
-        async function fethData(){
-            let response = await detailProduct(id)
-            setProduct(response)
-        }
-        fethData()
+        axios.get(`http://localhost:8080/products/${id}`).then(res => {
+            setProduct(res.data)             
+        })
     }, [id, detailProduct])
-
-
 
     return(
         <div>

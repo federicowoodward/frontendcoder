@@ -2,72 +2,30 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios"
 import Loader from "./loaders/loader.js";
+import { UseCartContext } from "../context/productsContext.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
     const [user, setUser] = useState([]);
     const [error, setError] = useState({});
     const [loader, setLoader] = useState(false)
-    
+    const { cookiesManager } = UseCartContext()
+
     useEffect(() => {
         checkCookies()
-    })
-
+    }, [])
+    
     const checkCookies = async () => {
         const data = await cookiesManager("check")
         console.log(data)
-        // if (data.data.user !== undefined) {
-        //     setUser(data.data.user)
-        //     setLoginStatus(true)
-        // } else {
-        //     setLoginStatus(false)
-        // }
-    }
-
-
-    async function cookiesManager (identifier) {
-        switch (identifier) {
-
-            case "create": 
-                try {
-                    const { data } = await axios.post(
-                        "http://localhost:8080/users/cookies",
-                        {
-                            name: user.name,
-                        },
-                        { 
-                            withCredentials: true 
-                        }
-                    )
-                    return data
-                } catch (err) {
-                    console.log(err)
-                }
-            break;
-
-            case "update": 
-
-            break;
-
-            case "check": 
-                try {
-                    const { data } = await axios.get("http://localhost:8080/users/getcookies");
-                    return data
-                } catch (err) {
-                    console.log(+ err)
-                }
-            break;
-
-            case "delete": 
-                axios.delete("http://localhost:8080/users/deletecookies")
-            break;
-            
-            default:   
-                console.log("falta identificador")
-                return;
+        if (data === "empty") {
+            setLoginStatus(false)
+        } else {
+            setUser({ user: data.data.user, rol: data.data.rol })
+            setLoginStatus(true)
         }
     }
-
+    
     const defineUser = (e) => {
         e.preventDefault()
         setUser({
@@ -76,48 +34,44 @@ export default function Login() {
         })
     }
     
-    const loginUser = async (e) => {
-        e.preventDefault()
+    const loginUser = async () => {
         setErrorFunction({"status": "good"})
         if (user.password === undefined || user.name === undefined) {
             setErrorFunction({ "status": "error", "error": "faltan datos"})
         } else {
             setLoader(true)
-            setTimeout(() => {
-                setLoader(false)
-            }, 1000);
             axios.post("http://localhost:8080/users/login", {
                 name: user.name,
                 password: user.password
             })
             .then(async function  (response) {
                 if (response.data.status === "correct") {
-                    const data = await cookiesManager("create")
+                    const data = await cookiesManager("create", user)
                     if (data.message === "saves") {
-                    } else {
-                        alert("no hemos podido recordarte, tendras que reloguearte")
+                        console.log(data.rol)
+                        setLoginStatus(true)
                     }
-                    setLoginStatus(true)
                 } else if (response.data.status === "error") {
                     setErrorFunction(response.data)
                 }
             })
+            .finally(() => {setLoader(false)})
         }
     }
-
+    
     const setErrorFunction = (error) => {
         setError(error)
     }
-
+    
     if(loader) {
         return (
             <Loader />
-        );
-    }
- 
-    else if (!loginStatus) {
-        return (
-            <div>
+            );
+        }
+        
+        else if (!loginStatus) {
+            return (
+                <div>
                 <form >
                     <input
                         onChange={(e) => { defineUser(e) }}
@@ -125,15 +79,15 @@ export default function Login() {
                         type="text"
                         name="name"
                         placeholder="nombre"
-                    />
+                        />
                     <input
                         onChange={(e) => { defineUser(e) }}
                         type="password"
                         name="password"
                         placeholder="contraseña"
-                    />
+                        />
                     <button
-                        onClick={(e) => loginUser(e)}>Entrar</button>
+                        onClick={() => loginUser()}>Entrar</button>
                 </form>
                 {
                     error.status === "error" &&
@@ -149,7 +103,7 @@ export default function Login() {
     }
     if (loginStatus) {
         return (
-            <Link to={`/menu/?user=${user.name}`}>
+            <Link to={`/menu/${user.name}`}>
                 <button>Menu</button>
             </Link>
         );
