@@ -8,12 +8,14 @@ import NavBar from "./components/navBar.js";
 import ItemDetail from "./components/products/itemDetail.js";
 import CartContextProvider from "./context/productsContext.js";
 import Cart from "./components/cart/cart.js";
+import SetProduct from "./components/setProduct.js";
 
 function App() {
     return (
         <BrowserRouter>
             <CartContextProvider value={{}}>
                 <div className="app">
+                        <SetProduct/>
                         <NavBar />
                         {/* <ItemListContainer /> */}
                     <Routes>

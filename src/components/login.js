@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useState } from "react";
 import axios from "axios"
 import Loader from "./loaders/loader.js";
 import { UseCartContext } from "../context/productsContext.js";
@@ -7,24 +7,9 @@ import { UseCartContext } from "../context/productsContext.js";
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
     const [user, setUser] = useState([]);
-    const [error, setError] = useState({});
+    const [error, setError] = useState({"status": "good"});
     const [loader, setLoader] = useState(false)
     const { cookiesManager } = UseCartContext()
-
-    useEffect(() => {
-        checkCookies()
-    }, [])
-    
-    const checkCookies = async () => {
-        const data = await cookiesManager("check")
-        console.log(data)
-        if (data === "empty") {
-            setLoginStatus(false)
-        } else {
-            setUser({ user: data.data.user, rol: data.data.rol })
-            setLoginStatus(true)
-        }
-    }
     
     const defineUser = (e) => {
         e.preventDefault()
@@ -35,7 +20,6 @@ export default function Login() {
     }
     
     const loginUser = async () => {
-        setErrorFunction({"status": "good"})
         if (user.password === undefined || user.name === undefined) {
             setErrorFunction({ "status": "error", "error": "faltan datos"})
         } else {
@@ -48,14 +32,17 @@ export default function Login() {
                 if (response.data.status === "correct") {
                     const data = await cookiesManager("create", user)
                     if (data.message === "saves") {
-                        console.log(data.rol)
+                        localStorage.setItem("name", user.name)
+                        setUser({ name: user.name , rol: data.rol })
                         setLoginStatus(true)
                     }
                 } else if (response.data.status === "error") {
                     setErrorFunction(response.data)
                 }
             })
-            .finally(() => {setLoader(false)})
+            .finally(() => setTimeout(() => {
+                setLoader(false)
+            }, "0500"))
         }
     }
     
@@ -72,23 +59,25 @@ export default function Login() {
         else if (!loginStatus) {
             return (
                 <div>
-                <form >
-                    <input
-                        onChange={(e) => { defineUser(e) }}
-                        id= "name"
-                        type="text"
-                        name="name"
-                        placeholder="nombre"
-                        />
-                    <input
-                        onChange={(e) => { defineUser(e) }}
-                        type="password"
-                        name="password"
-                        placeholder="contraseña"
-                        />
+                    <form >
+                        <input
+                            onChange={(e) => { defineUser(e) }}
+                            id= "name"
+                            type="text"
+                            name="name"
+                            placeholder="nombre"
+                            />
+                        <input
+                            onChange={(e) => { defineUser(e) }}
+                            type="password"
+                            name="password"
+                            placeholder="contraseña"
+                            />
+                    </form>
                     <button
-                        onClick={() => loginUser()}>Entrar</button>
-                </form>
+                        onClick={loginUser}>
+                        Entrar
+                    </button>
                 {
                     error.status === "error" &&
                     <div>
@@ -103,9 +92,7 @@ export default function Login() {
     }
     if (loginStatus) {
         return (
-            <Link to={`/menu/${user.name}`}>
-                <button>Menu</button>
-            </Link>
+            <Navigate to={`/menu/${user.name}`}/>
         );
     }
 }

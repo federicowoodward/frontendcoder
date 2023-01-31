@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 
 export default function Menu() {
     const [despedida, setDespedida] = useState(false)
@@ -15,12 +15,17 @@ export default function Menu() {
         } catch (err) {
             console.log(err)
         }
-
         setTimeout(() => {
-            setDespedida(false)
+            setDespedida("ready");
+            
         }, 2000)
     }
 
+    if (despedida === "ready") {
+        return(
+            <Navigate to="/login" />
+        )
+    }
     if (despedida) {
         return (
             <div>
