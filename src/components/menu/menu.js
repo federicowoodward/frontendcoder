@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import ItemListContainer from '../products/itemListContainer.js'
-import SetProduct from '../products/setProduct.js'
+import SetProduct from '../products/setProduct.js';
+import { UseCartContext } from "../../context/productsContext.js";
 
 export default function Menu() {
     const [despedida, setDespedida] = useState(false)
     const { user } = useParams()
+    const { cookiesManager } = UseCartContext()
 
     const unlogin = async (e) => {
         e.preventDefault()
         try {
             // crear context para cookies
-            // cookiesManager("delete")
+            cookiesManager("delete")
             setDespedida(true)
             localStorage.removeItem('rol')
             localStorage.removeItem('name')
