@@ -30,6 +30,9 @@ export default function Login() {
             })
             .then(async function  (response) {
                 if (response.data.status === "correct") {
+                    if (response.data.user[0].rol === "admin") {
+                        localStorage.setItem("rol", "admin")
+                    }
                     const data = await cookiesManager("create", user)
                     if (data.message === "saves") {
                         localStorage.setItem("name", user.name)

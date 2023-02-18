@@ -93,7 +93,7 @@ export default function Register() {
     } else if (registerStatus) {
         return (
             <div>
-                <h2>Cuenta creada {user.name}! Loegate aqui abajo</h2>
+                <h2>Cuenta creada {user.name}! Logeate aqui abajo</h2>
                 <Link to="/login" >
                     <button>Login</button>
                 </Link>

@@ -1,6 +1,4 @@
 .flex-item {
-    height: 150px;
-    width: 150px;
-    background-color: red;
-    margin: 10px
+    border: 1px solid white;
+    margin: 10px;
 }

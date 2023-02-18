@@ -1,6 +1,6 @@
 import Item from './item.js';
 import React from 'react';
-// import "./itemList.css";
+import "./itemList.css";
 export default function ItemList({ products, id}){
     return (
         <div className="item-container">

@@ -3,7 +3,7 @@ import { useState } from "react"
 
 export default function SetProduct() {
     const [product, setProduct] = useState([])    
-
+    const [state, setState] = useState(false)
     function generateProduct(e) {
         setProduct({
             ...product,
@@ -15,7 +15,7 @@ export default function SetProduct() {
         axios.post("http://localhost:8080/products/", {
             product
         }).then(function(response) {
-            console.log(response)
+            response.data.message === "created" && setState(true)
         })
     }
 
@@ -27,6 +27,9 @@ export default function SetProduct() {
                 <input type="text" name="precio" placeholder="precio" onChange={(e) => generateProduct(e)}/>
                 <input type="text" name="stock" placeholder="stock" onChange={(e) => generateProduct(e)}/>
             </form>
+            {
+                state && <p>creado!</p>
+            }
             <button onClick={sendProduct}>Enviar</button>
         </div>
     )
