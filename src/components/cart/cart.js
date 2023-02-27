@@ -1,52 +1,47 @@
-import { UseCartContext } from "../../context/productsContext.js";
-import { Link } from "react-router-dom";
-import CartItem from "./cartItem.js"; 
-// import "./cartWithItem.css";
-// import "./cart.css";
+import { UseCartContext } from '../../context/productsContext.js'
+import { Link } from 'react-router-dom'
+import CartItem from './cartItem.js'
 
 export default function Cart() {
-    const {products, clearCart} = UseCartContext();
- 
-    if (products.length!==0) { 
+    const { products, clearCart } = UseCartContext()
+    if (products.length !== 0) {
         return (
-            <div className="cartWithItems">
+            <div>
                 <h2> Haz agregado las siguientes fotos:</h2>
-                <div className="itemsContainer">
-                    {products.map(item => <CartItem key={item._id} item={item} quantity={1}/>)}
+                <div>
+                    {products.map((item) => (
+                        <CartItem
+                            key={item.product._id}
+                            item={item.product}
+                            quantity={item.quantity}
+                        />
+                    ))}
                 </div>
-                <div className="cartButtons">
-                    <div className="clearCartButton">
-                        <button className="noselect" onClick={clearCart}>
-                            <span className="text">Vaciar</span>
-                            <span className="icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                    <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
-                                </svg>
-                            </span>
+                <div>
+                    <div>
+                        <button onClick={clearCart}>
+                            <span>Vaciar</span>
                         </button>
+                        <Link to={`/menu/${localStorage.getItem("name")}`}>
+                            <button>Seguir agregando.</button>
+                        </Link>
                     </div>
-                    <Link to="/order">
-                        <button>
-                            <span className="button_top" >Enviar pedido</span>
-                        </button>
-                    </Link>
+                    {/* <Link to="/order"> */}
+                    {/* <button> */}
+                    {/* <span className="button_top" >Enviar pedido</span> */}
+                    {/* </button> */}
+                    {/* </Link> */}
                 </div>
             </div>
-        );
-    }
-    else {
+        )
+    } else {
         return (
-            <div className="cart">
-                <h2>No hay fotos agregadas.</h2>
-                <Link to="/category/">
-                    <div className="fancy">
-                        <span className="top-key"></span>
-                        <span className="text">Agrega fotos!</span>
-                        <span className="bottom-key-1"></span>
-                        <span className="bottom-key-2"></span>
-                    </div>
+            <div>
+                <h2>No hay productos actualmente.</h2>
+                <Link to={`/menu/${localStorage.getItem("name")}`}>
+                    <button>Agrega productos!</button>
                 </Link>
             </div>
-        );
+        )
     }
 }

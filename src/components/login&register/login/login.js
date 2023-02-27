@@ -1,8 +1,8 @@
 import { Link, Navigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios"
-import Loader from "./loaders/loader.js";
-import { UseCartContext } from "../context/productsContext.js";
+import Loader from "../../loaders/loader.js";
+import { UseCartContext } from "../../../context/productsContext.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);

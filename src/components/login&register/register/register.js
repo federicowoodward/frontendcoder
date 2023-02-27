@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios"
-import Loader from "./loaders/loader.js";
+import Loader from "../../loaders/loader.js";
 
 export default function Register() {
     const [registerStatus, setRegisterStatus] = useState(false);

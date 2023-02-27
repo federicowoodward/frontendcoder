@@ -1,23 +1,31 @@
-import {  useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { UseCartContext } from "../../context/productsContext.js";
-import axios from "axios";
+import { UseCartContext } from "../../context/productsContext"
+import { useState } from "react"
+import BuyButtons from "../buyButtons/buyButtons.js"
+import ItemCount from '../itemCount/itemCount.js'
 
-export default function Detail() {
-    const [product, setProduct] = useState([])
-    const { detailProduct } = UseCartContext()
-    const {id} = useParams()
-    
-    useEffect(() => {
-        axios.get(`http://localhost:8080/products/${id}`).then(res => {
-            setProduct(res.data)             
-        })
-    }, [id, detailProduct])
+export default function ItemDetail({product}) {
+    const [inputType, setInputType] = useState('itemCount')
+    const { addToCart } = UseCartContext()
 
-    return(
+    function onAdd(quantity) {
+        if (Object.keys(product).length !== 0) {
+            addToCart({ product, quantity })
+            setInputType('buyButtons')
+        } 
+    }
+
+    return (
         <div>
-            {product.nombre}:<br />
-            {product.descripcion}
+            <p>{product.nombre}</p>
+            <p>{product.descripcion}</p>
+            <p>{product.stock}</p>
+            <p>{product.precio}</p>
+            {
+                inputType === 'buyButtons' ? 
+                <BuyButtons/>
+                :
+                <ItemCount initial={1} stock={product.stock} onAdd={onAdd}/>
+            }
         </div>
-    );
+    )
 }

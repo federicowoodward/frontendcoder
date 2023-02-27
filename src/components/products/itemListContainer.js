@@ -21,7 +21,6 @@ function ItemListContainer (){
             }})
             .catch(err => console.log(err))
             .finally(() => {
-                defineProducts(productsList)
                 setTimeout(() => {
                     setLoading(false)
                 }, 0);

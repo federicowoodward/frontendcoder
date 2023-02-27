@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react"; 
-import axios from "axios";
+import axios from 'axios'
 
 const cartContext = createContext([]);
 
@@ -14,12 +14,34 @@ export default function ProductsContext({children}){
         setProducts(list)
     }
 
+    function isInCart(id){
+        return products.some(product => product.id === id)
+    }
+    
+    function addToCart(item) {
+        let quantity = item.quantity
+        let id = item.product._id
+        let product = item.product
+      
+        if (isInCart(id)) {
+            let i = products.findIndex(i => i.product.id === id)
+            const newList = products;
+            newList[i].quantity += quantity;
+            udapteCart(newList);
+        } else {
+            delete product.__v
+            udapteCart([...products, { product, quantity}]);
+        }
+    }
+    
     function clearCart() {
         udapteCart([])
     }
-
+    
     function udapteCart(array) {
         setProducts(array);
+
+        axios
         // let QA = 0;
         // for(let i = 0; i < array.length; i++) {
             // QA += array[i].quantity;
@@ -82,10 +104,10 @@ export default function ProductsContext({children}){
     return (
         <cartContext.Provider value={{
             products,
-            defineProducts,
             clearCart,
             clearItem,
-            cookiesManager
+            cookiesManager,
+            addToCart
         }}>
             {children}
         </cartContext.Provider> 

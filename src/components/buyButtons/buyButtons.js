@@ -8,11 +8,9 @@ export default function BuyButtons() {
                     <span className="button_top" >Ver carrito</span>
                 </button>
             </Link>
-            <Link to="/category/" >
-                <button>
-                    <span className="button_top" >Seguir comprando</span>
-                </button>
-            </Link>
+            <Link to={`/menu/${localStorage.getItem("name")}`}>
+                    <button>Agrega productos!</button>
+                </Link>
         </div>
     );
 }

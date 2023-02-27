@@ -9,12 +9,17 @@ export default function Item({ product }) {
 
     return (
         <div className="flex-item">
-            <img className="itemImg" src={product.img} alt={product.nombre} />
             <Link to={`/detail/${product._id}`}>
+                <img
+                    className="itemImg"
+                    src={product.img}
+                    alt={product.nombre}
+                />
+                <p>{product.descripcion}</p>
                 <p>{product.precio}</p>
                 <p>{product.stock}</p>
             </Link>
-            {localStorage.getItem('rol') === "admin" && (
+            {localStorage.getItem('rol') === 'admin' && (
                 <button onClick={deleteItem} className="button-delete-item">
                     Borrar item
                 </button>
