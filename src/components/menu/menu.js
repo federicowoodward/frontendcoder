@@ -1,19 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Navigate, Link } from 'react-router-dom'
 import ItemListContainer from '../products/itemListContainer.js'
 import SetProduct from '../products/setProduct.js'
-import { UseCartContext } from '../../context/productsContext.js'
+// import { UseCartContext } from '../../context/productsContext.js'
+import { checkStatusSession } from '../login&register/checkStatus.js'
+import CartsContainer from '../cartsAdmin/cartsAdminContainer.js'
 
 export default function Menu() {
     const [despedida, setDespedida] = useState(false)
     const { user } = useParams()
-    const { cookiesManager } = UseCartContext()
+    // const { cookiesManager } = UseCartContext()
+
+    useEffect(() => {
+        if (checkStatusSession() === false) {
+            return <Navigate to="/login" />
+        } 
+    })
 
     const unlogin = async (e) => {
         e.preventDefault()
         try {
             // crear context para cookies
-            cookiesManager('delete')
             setDespedida(true)
             localStorage.removeItem('rol')
             localStorage.removeItem('name')
@@ -46,7 +53,7 @@ export default function Menu() {
                 </Link>
                 <button onClick={(e) => unlogin(e)}>Desloguearse</button>
                 <ItemListContainer />
-                {localStorage.getItem('rol') === 'admin' && <SetProduct />}
+                {localStorage.getItem('rol') === 'admin' && <div><SetProduct /> <CartsContainer /></div>}
             </div>
         )
     }

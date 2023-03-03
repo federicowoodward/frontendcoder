@@ -16,11 +16,16 @@ export default function SetProduct() {
             product
         }).then(function(response) {
             response.data.message === "created" && setState(true)
+        }).finally(() => {
+            setTimeout(() => {
+                setState(false)
+            }, 5000);
         })
     }
 
     return(
         <div>
+            <p>Creador de productos</p>
             <form>
                 <input type="text" name="nombre" placeholder="nombre" onChange={(e) => generateProduct(e)}/>
                 <input type="text" name="descripcion" placeholder="descripcion" onChange={(e) => generateProduct(e)}/>

@@ -29,6 +29,7 @@ function ItemListContainer (){
         
     return (
         <div>
+            <p>Productos:</p>
             {loading ? <Loader/> :<ItemList products={productsList}/>}
         </div>
     );

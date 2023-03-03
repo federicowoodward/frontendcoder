@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios"
 import Loader from "../../loaders/loader.js";
 import { UseCartContext } from "../../../context/productsContext.js";
+import { checkStatusSession } from "../checkStatus.js";
 
 export default function Login() {
     const [loginStatus, setLoginStatus] = useState(false);
@@ -24,21 +25,19 @@ export default function Login() {
             setErrorFunction({ "status": "error", "error": "faltan datos"})
         } else {
             setLoader(true)
-            axios.post("http://localhost:8080/users/login", {
+            axios.post("http://localhost:8080/users/", {
                 name: user.name,
                 password: user.password
             })
             .then(async function  (response) {
                 if (response.data.status === "correct") {
-                    if (response.data.user[0].rol === "admin") {
+                    let data = response.data.data
+                    if (data.rol === "admin") {
                         localStorage.setItem("rol", "admin")
                     }
-                    const data = await cookiesManager("create", user)
-                    if (data.message === "saves") {
-                        localStorage.setItem("name", user.name)
-                        setUser({ name: user.name , rol: data.rol })
+                    localStorage.setItem("name", data.name)
+                    setUser({ name: data.name })
                         setLoginStatus(true)
-                    }
                 } else if (response.data.status === "error") {
                     setErrorFunction(response.data)
                 }
